@@ -735,12 +735,11 @@
                     <p>📸 @thewebbuddy</p>
                 </div>
             </div>
-            <form onsubmit="handleContact(event)">
-    <input type="text" id="name" placeholder="Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <textarea id="message" rows="5" placeholder="Tell me about your project..." required></textarea>
-    <button type="submit" class="btn-send">Send Inquiry</button>
-</form>
+            <div class="dm-only">
+    <button class="btn-send" onclick="openInstagramDM()">
+        DM FOR MORE!
+    </button>
+</div>
         </div>
     </section>
 
@@ -869,33 +868,14 @@ window.addEventListener('scroll', () => {
 });
 
 // Contact Form Handler
-function handleContact(e) {
-    e.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const message = document.getElementById("message").value;
 
-    if (!name || !email || !message) {
-        alert("Please fill all fields");
-        return;
-    }
-
-    const text = `🔥 New Website Inquiry 🔥
-
-👤 Name: ${name}
-📧 Email: ${email}
-📝 Project:
-${message}`;
-
-    const instagramUsername = "thewebbuddy";
-    const igLink = `https://ig.me/m/${instagramUsername}?text=${encodeURIComponent(text)}`;
-
-    window.open(igLink, "_blank");
+function openInstagramDM() {
+    window.open("https://ig.me/m/thewebbuddy", "_blank");
 }
+
 </script>
 
    
 </body>
 </html>
-
