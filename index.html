@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Web Buddy | Premium UI/UX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #c41e3a;
+            --dark: #050505;
+            --surface: #111111;
+            --accent: #1e1e1e;
+            --light: #f1f5f9;
+            --gray: #64748b;
+            --glow: 0 0 20px rgba(196, 30, 58, 0.4);
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--dark); 
+            color: var(--light); 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: -1px; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--dark); }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+
+        /* Custom Cursor */
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.15s cubic-bezier(0.23, 1, 0.32, 1);
+            opacity: 0;
+        }
+        .custom-cursor.active { opacity: 1; }
+        .custom-cursor.hover { 
+            transform: scale(2); 
+            background: rgba(196, 30, 58, 0.1);
+            border-color: var(--primary);
+        }
+        .cursor-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s ease;
+            opacity: 0;
+        }
+        .cursor-dot.active { opacity: 1; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+        
+        .section-header { 
+            margin-bottom: 4rem; 
+            text-align: center;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: var(--transition);
+        }
+        .section-header.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .section-header h2 { 
+            font-size: 3rem; 
+            position: relative; 
+            display: inline-block;
+            animation: fadeInUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        .section-header h2::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: -10px; 
+            left: 0; 
+            width: 0%; 
+            height: 4px; 
+            background: var(--primary);
+            transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .section-header.visible h2::after {
+            width: 60%;
+        }
+
+        /* --- Creative Navbar --- */
+        nav { 
+            position: fixed; 
+            width: 100%; 
+            top: 0; 
+            z-index: 1000; 
+            transition: var(--transition); 
+            border-bottom: 1px solid transparent;
+            transform: translateY(0);
+        }
+        nav.scrolled { 
+            background: rgba(5, 5, 5, 0.95); 
+            backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--accent); 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        .nav-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 0.8rem 0;
+        }
+        
+        /* Minimalist SVG Logo Styling */
+        .logo-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            cursor: pointer; 
+            transition: var(--transition);
+            position: relative;
+        }
+        .logo-svg { 
+            height: 45px; 
+            width: auto; 
+            filter: drop-shadow(0 0 5px rgba(196, 30, 58, 0.3));
+            transition: var(--transition);
+        }
+        .logo-text { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            font-weight: 800; 
+            font-size: 1.2rem; 
+            letter-spacing: 1px; 
+            color: var(--light);
+            transition: var(--transition);
+        }
+        .logo-text span { color: var(--primary); }
+        .logo-container:hover { transform: scale(1.05); }
+        .logo-container:hover .logo-svg { 
+            filter: drop-shadow(0 0 15px rgba(196, 30, 58, 0.6));
+            transform: rotate(5deg);
+        }
+
+        .nav-links { display: flex; align-items: center; gap: 0; }
+        .nav-links a { 
+            color: var(--light); 
+            text-decoration: none; 
+            font-weight: 600; 
+            margin-left: 2rem; 
+            font-size: 0.9rem; 
+            transition: var(--transition); 
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+        .nav-links a:hover { 
+            color: var(--primary); 
+            text-shadow: var(--glow);
+            transform: translateY(-2px);
+        }
+
+        /* --- Hero with Advanced Animations --- */
+        .hero { 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            position: relative; 
+            overflow: hidden;
+        }
+        .hero-bg { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            background: radial-gradient(circle at 80% 20%, #1a1a1a 0%, transparent 40%), 
+                        radial-gradient(circle at 20% 80%, #110000 0%, transparent 40%); 
+            z-index: -1;
+            animation: pulseGlow 8s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .hero-content {
+            opacity: 0;
+            animation: heroFadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) 0.3s forwards;
+        }
+        @keyframes heroFadeIn {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero h1 { 
+            font-size: clamp(3rem, 8vw, 6rem); 
+            line-height: 0.9; 
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .hero h1 .line {
+            display: block;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        .hero h1 .line.animate {
+            animation: slideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        .hero h1 .line:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero span { 
+            color: var(--primary); 
+            text-shadow: 0 0 30px rgba(196, 30, 58, 0.4);
+            display: inline-block;
+            animation: glowPulse 3s ease-in-out infinite;
+        }
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 30px rgba(196, 30, 58, 0.4); }
+            50% { text-shadow: 0 0 50px rgba(196, 30, 58, 0.7); }
+        }
+        .hero p {
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) 0.8s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Floating Particles Background */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 20s infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(100px, -100px); }
+            50% { transform: translate(-50px, -200px); }
+            75% { transform: translate(150px, -150px); }
+        }
+
+        /* --- About Section with Parallax --- */
+        .about-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 4rem; 
+            align-items: center;
+        }
+        .about-grid > * {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .about-grid.visible > * {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .about-grid > *:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--accent);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(196, 30, 58, 0.1), transparent);
+            transition: left 0.6s;
+        }
+        .stat-card:hover::before {
+            left: 100%;
+        }
+        .stat-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.2);
+        }
+
+        /* --- Enhanced Portfolio --- */
+        .portfolio-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); 
+            gap: 2.5rem;
+        }
+        .project-card { 
+            background: var(--surface); 
+            border-radius: 24px; 
+            overflow: hidden; 
+            border: 1px solid var(--accent); 
+            transition: var(--transition); 
+            position: relative;
+            opacity: 0;
+            transform: translateY(40px) scale(0.95);
+            cursor: pointer;
+        }
+        .project-card.visible {
+            animation: cardFadeIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+        @keyframes cardFadeIn {
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        .project-card:hover { 
+            transform: translateY(-15px) scale(1.02); 
+            border-color: var(--primary); 
+            box-shadow: 0 20px 60px rgba(196, 30, 58, 0.3);
+        }
+        .project-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+        .project-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            opacity: 0.8; 
+            transition: var(--transition);
+            transform: scale(1);
+        }
+        .project-card:hover .project-img {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .project-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 0%, rgba(196, 30, 58, 0.9) 100%);
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: flex-end;
+            padding: 2rem;
+        }
+        .project-card:hover .project-overlay {
+            opacity: 1;
+        }
+        .project-overlay-text {
+            color: white;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        .project-card:hover .project-overlay-text {
+            transform: translateY(0);
+        }
+        .project-info { 
+            padding: 2rem;
+            position: relative;
+        }
+        .project-info small {
+            display: inline-block;
+            transform: translateX(0);
+            transition: var(--transition);
+        }
+        .project-card:hover .project-info small {
+            transform: translateX(5px);
+        }
+        .project-info h3 {
+            margin-top: 0.5rem;
+            transition: var(--transition);
+        }
+        .project-card:hover .project-info h3 {
+            color: var(--primary);
+        }
+        .delete-btn { 
+            position: absolute; 
+            top: 1rem; 
+            right: 1rem; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            opacity: 0; 
+            transition: var(--transition); 
+            z-index: 10;
+            font-weight: 800;
+            transform: scale(0.8);
+        }
+        .project-card:hover .delete-btn { 
+            opacity: 1;
+            transform: scale(1);
+        }
+        .delete-btn:hover {
+            background: #a01828;
+            transform: scale(1.1);
+        }
+
+        /* --- Magnetic Button Effect --- */
+        .btn-send { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 1rem 2rem; 
+            border-radius: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            width: 100%; 
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+        }
+        .btn-send::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .btn-send:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+        .btn-send:hover { 
+            letter-spacing: 3px; 
+            box-shadow: 0 10px 40px rgba(196, 30, 58, 0.5);
+            transform: translateY(-3px);
+        }
+        .btn-send:active {
+            transform: translateY(-1px);
+        }
+
+        /* --- Admin Panel --- */
+        .admin-panel { 
+            background: var(--surface); 
+            padding: 3rem; 
+            border-radius: 24px; 
+            margin-bottom: 4rem; 
+            border: 1px dashed var(--primary);
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .admin-panel.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Form Elements --- */
+        input, textarea { 
+            background: var(--dark); 
+            border: 1px solid var(--accent); 
+            padding: 1rem; 
+            color: white; 
+            border-radius: 12px; 
+            font-family: inherit; 
+            width: 100%; 
+            margin-bottom: 1rem;
+            transition: var(--transition);
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(196, 30, 58, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Contact Form Enhancement */
+        .contact-info {
+            opacity: 0;
+            transform: translateX(-40px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .contact-info.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        form {
+            opacity: 0;
+            transform: translateX(40px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        form.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Footer */
+        footer { 
+            padding: 4rem 0; 
+            border-top: 1px solid var(--accent); 
+            text-align: center; 
+            margin-top: 4rem;
+            position: relative;
+        }
+        footer p {
+            opacity: 0;
+            animation: fadeIn 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        /* Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--primary);
+            z-index: 9999;
+            transition: width 0.1s ease;
+            box-shadow: var(--glow);
+        }
+
+        /* Loading Animation */
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+        .page-loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+        .loader-logo {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+            .portfolio-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.5rem; }
+            .section-header h2 { font-size: 2rem; }
+            .nav-links { display: none; }
+            .custom-cursor, .cursor-dot { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="loader-logo">
+            <svg width="80" height="80" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M30 5V55M5 30H55M12 12L48 48M48 12L12 48" stroke="#333" stroke-width="1" opacity="0.5"/>
+                <path d="M22 15L30 10L38 15M45 22L50 30L45 38M38 45L30 50L22 45M15 38L10 30L15 22" stroke="#c41e3a" stroke-width="1.5"/>
+                <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="800" font-size="22" fill="white">W</text>
+                <text x="55%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="800" font-size="14" fill="#c41e3a">B</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+
+    <!-- Custom Cursor -->
+    <div class="custom-cursor"></div>
+    <div class="cursor-dot"></div>
+
+    <nav id="navbar">
+        <div class="container nav-content">
+            <div class="logo-container" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <svg class="logo-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M30 5V55M5 30H55M12 12L48 48M48 12L12 48" stroke="#333" stroke-width="1" opacity="0.5"/>
+                    <path d="M22 15L30 10L38 15M45 22L50 30L45 38M38 45L30 50L22 45M15 38L10 30L15 22" stroke="var(--primary)" stroke-width="1.5"/>
+                    <text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="800" font-size="22" fill="white">W</text>
+                    <text x="55%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="Plus Jakarta Sans" font-weight="800" font-size="14" fill="var(--primary)">B</text>
+                </svg>
+                <div class="logo-text">THE WEB <span>BUDDY</span></div>
+            </div>
+
+            <div class="nav-links">
+                <a href="#about">About</a>
+                <a href="#portfolio">Work</a>
+                <a href="#admin">Admin</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+     <section class="hero">
+        <div class="hero-bg"></div>
+<div class="particles" id="particles"></div>
+
+
+        <div class="container hero-content">
+            <h1>STAYING <br><span>STICKY</span> ONLINE.</h1>
+            <p style="max-width: 500px; color: var(--gray); font-size: 1.2rem;">The Web Buddy creates high-performance digital webs for modern brands. We build, you grow!</p>
+        </div>
+    </section>
+
+
+    <section id="about" class="container" style="padding: 100px 0;">
+        <div class="about-grid">
+            <div class="section-header" style="text-align: left; margin-bottom: 0;">
+                <small style="color: var(--primary); font-weight: 800; letter-spacing: 2px;">WHO WE ARE</small>
+                <h2 style="display: block; margin-top: 1rem;">Building Digital <br>Authority.</h2>
+            </div>
+            <div>
+                <p style="font-size: 1.1rem; color: var(--light); margin-bottom: 2rem;">
+                    At <strong>The Web Buddy</strong>, we don't just build websites; we craft digital ecosystems designed to capture attention and never let go.
+                </p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="stat-card">
+                        <h4 style="color: var(--primary);">STRATEGY</h4>
+                        <p style="color: var(--gray); font-size: 0.9rem;">Conversion-focused layouts.</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 style="color: var(--primary);">DESIGN</h4>
+                        <p style="color: var(--gray); font-size: 0.9rem;">Premium UI/UX aesthetics.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio" class="container" style="padding: 100px 0;">
+        <div class="section-header"><h2>Portfolio</h2></div>
+       <div class="portfolio-grid">
+
+    <!-- Project 1 -->
+    <div class="project-card visible">
+        <div class="project-img-wrapper">
+            <img src="images/business.png" class="project-img">
+            <div class="project-overlay">
+                <div class="project-overlay-text">VIEW PROJECT →</div>
+            </div>
+        </div>
+        <div class="project-info">
+            <small style="color: var(--primary); font-weight: 800;">Business Website</small>
+            <h3>Gym/Mart/Shops.,</h3>
+        </div>
+    </div>
+
+    <!-- Project 2 -->
+    <div class="project-card visible">
+        <div class="project-img-wrapper">
+            <img src="images/branding.png" class="project-img">
+            <div class="project-overlay">
+                <div class="project-overlay-text">VIEW PROJECT →</div>
+            </div>
+        </div>
+        <div class="project-info">
+            <small style="color: var(--primary); font-weight: 800;">Cafe Branding</small>
+            <h3>Tif/Suvichai/C&Q.,</h3>
+        </div>
+    </div>
+
+    <!-- Project 3 -->
+    <div class="project-card visible">
+        <div class="project-img-wrapper">
+            <img src="images/global.png" class="project-img">
+            <div class="project-overlay">
+                <div class="project-overlay-text">VIEW PROJECT →</div>
+            </div>
+        </div>
+        <div class="project-info">
+            <small style="color: var(--primary); font-weight: 800;">Global Project</small>
+            <h3>Novablooms/Resturant.,</h3>
+        </div>
+    </div>
+
+</div>
+
+    </section>
+
+    <section id="contact" class="container" style="padding: 100px 0;">
+        <div class="about-grid">
+            <div class="contact-info">
+                <h3>Let's Chat.</h3>
+                <p>Ready to get your brand the attention it deserves?</p>
+                <div style="margin-top: 2rem;">
+                    <p>📧 buddy@thewebbuddy.com</p>
+                    <p>📸 @thewebbuddy</p>
+                </div>
+            </div>
+            <form onsubmit="handleContact(event)">
+    <input type="text" id="name" placeholder="Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <textarea id="message" rows="5" placeholder="Tell me about your project..." required></textarea>
+    <button type="submit" class="btn-send">Send Inquiry</button>
+</form>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 THE WEB BUDDY | DESIGNED TO CONVERT</p>
+    </footer>
+
+    <script>
+        // Page Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.page-loader').classList.add('hidden');
+                animateHero();
+            }, 1000);
+        });
+
+        // Hero Animation
+        function animateHero() {
+            const lines = document.querySelectorAll('.hero h1 .line');
+            lines.forEach(line => line.classList.add('animate'));
+        }
+
+        // Custom Cursor
+        const cursor = document.querySelector('.custom-cursor');
+        const cursorDot = document.querySelector('.cursor-dot');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+        let dotX = 0, dotY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursor.classList.add('active');
+            cursorDot.classList.add('active');
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            dotX += (mouseX - dotX) * 0.25;
+            dotY += (mouseY - dotY) * 0.25;
+            
+            cursor.style.left = cursorX + 'px';
+            cursor.style.top = cursorY + 'px';
+            cursorDot.style.left = dotX + 'px';
+            cursorDot.style.top = dotY + 'px';
+            
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Hover effect for interactive elements
+        const interactiveElements = document.querySelectorAll('a, button, .project-card, .logo-container, input, textarea');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+        });
+
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.querySelector('.scroll-progress').style.width = scrolled + '%';
+        });
+
+        // Navbar Scroll Effect
+        window.onscroll = () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        };
+
+        // Intersection Observer for Animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all animated elements
+        document.addEventListener('DOMContentLoaded', () => {
+            const animatedElements = document.querySelectorAll('.section-header, .about-grid, .admin-panel, .contact-info, form');
+            animatedElements.forEach(el => observer.observe(el));
+        });
+
+        // Floating Particles
+        const particlesContainer = document.getElementById('particles');
+        for (let i = 0; i < 30; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+                
+
+        // Smooth Scroll for Navigation Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Parallax Effect on Scroll
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const parallaxElements = document.querySelectorAll('.hero-bg, .particles');
+    parallaxElements.forEach(el => {
+        el.style.transform = `translateY(${scrolled * 0.5}px)`;
+    });
+});
+
+// Contact Form Handler
+function handleContact(e) {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const message = document.getElementById("message").value;
+
+    if (!name || !email || !message) {
+        alert("Please fill all fields");
+        return;
+    }
+
+    const text = `🔥 New Website Inquiry 🔥
+
+👤 Name: ${name}
+📧 Email: ${email}
+📝 Project:
+${message}`;
+
+    const instagramUsername = "thewebbuddy";
+    const igLink = `https://ig.me/m/${instagramUsername}?text=${encodeURIComponent(text)}`;
+
+    window.open(igLink, "_blank");
+}
+</script>
+
+   
+</body>
+</html>
